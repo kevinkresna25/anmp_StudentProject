@@ -23,7 +23,8 @@ class StudentListAdapter(val studentList:ArrayList<Student>)
         holder.binding.txtID.text = studentList[position].id
         holder.binding.txtName.text = studentList[position].name
         holder.binding.btnDetail.setOnClickListener {
-            val action = StudentListFragmentDirections.actionStudentDetailFragment()
+            val id = studentList[position].id.toString()
+            val action = StudentListFragmentDirections.actionStudentDetailFragment(id)
             it.findNavController().navigate(action)
         }
     }

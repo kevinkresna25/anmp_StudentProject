@@ -3,6 +3,7 @@ package com.ubaya.studentproject.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
@@ -11,18 +12,16 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.ubaya.studentproject.model.Student
 
-class ListViewModel(app: Application): AndroidViewModel(app) {
-    val studentsLD = MutableLiveData<ArrayList<Student>>()
-    val loadingDL = MutableLiveData<Boolean>()
-    val errorLD = MutableLiveData<Boolean>()
+class DetailViewModel(app: Application): AndroidViewModel(app) {
+    val studentLD = MutableLiveData<Student>()
     val TAG = "volleytag"
     private var queue: RequestQueue? = null
 
-    fun refresh() {
-        loadingDL.value = true // progress bar start muncul
-        errorLD.value = false // tidak ada error
 
-//        studentsLD.value = arrayListOf(
+
+    fun fetch(id:String) {
+
+//        val data = arrayListOf(
 //            Student("16055","Nonie","1998/03/28","5718444778","http://dummyimage.com/75x100"
 //                    + ".jpg/cc0000/ffffff"),
 //            Student("13312","Rich","1994/12/14","3925444073","http://dummyimage.com/75x100" +
@@ -41,25 +40,15 @@ class ListViewModel(app: Application): AndroidViewModel(app) {
                 // Sukses
                 val sType = object: TypeToken<List<Student>>() {}.type
                 val result = Gson().fromJson<List<Student>>(it, sType)
-                studentsLD.value = result as ArrayList<Student>
+                val arrStudent = result as ArrayList<Student>
 
-                loadingDL.value = false
+                studentLD.value = arrStudent.find { it.id == id } as Student
             },
             {
                 // Failed
-                errorLD.value = true
-                loadingDL.value = false
             }
         )
         stringRequest.tag = TAG
         queue?.add(stringRequest)
-
-//        loadingDL.value = false // progress bar stop
-//        errorLD.value = false
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        queue?.cancelAll(TAG)
     }
 }
