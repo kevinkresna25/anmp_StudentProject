@@ -1,6 +1,7 @@
 package com.ubaya.studentproject.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.android.volley.Request
@@ -10,6 +11,7 @@ import com.android.volley.toolbox.Volley
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.ubaya.studentproject.model.Student
+import com.ubaya.studentproject.util.FileHelper
 
 class ListViewModel(app: Application): AndroidViewModel(app) {
     val studentsLD = MutableLiveData<ArrayList<Student>>()
@@ -44,6 +46,18 @@ class ListViewModel(app: Application): AndroidViewModel(app) {
                 studentsLD.value = result as ArrayList<Student>
 
                 loadingDL.value = false
+
+                // output simpan ke file
+                val fileHelper = FileHelper(getApplication())
+                // convert ArrayList ke JSON String
+                val jsonString = Gson().toJson(result)
+                fileHelper.writeToFile(jsonString)
+                Log.d("print_file", jsonString)
+
+                // baca json string dari file
+                val hasil = fileHelper.readFromFile()
+                val listStudent = Gson().fromJson<List<Student>>(hasil, sType)
+                Log.d("print_file", listStudent.toString())
             },
             {
                 // Failed
@@ -56,6 +70,14 @@ class ListViewModel(app: Application): AndroidViewModel(app) {
 
 //        loadingDL.value = false // progress bar stop
 //        errorLD.value = false
+    }
+
+    fun testSaveFile() {
+        val fileHelper = FileHelper(getApplication())
+        fileHelper.writeToFile("Hello thelol")
+        val content = fileHelper.readFromFile()
+        Log.d("print_file", content)
+        Log.d("print_file", fileHelper.getFilePath())
     }
 
     override fun onCleared() {
